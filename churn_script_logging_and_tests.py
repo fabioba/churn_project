@@ -2,7 +2,7 @@
 This module contains loggind and testing for churn project
 
 Author: Fabio
-Date: Dec. 2021
+Date: 4 Dec. 2021
 """
 
 
@@ -22,6 +22,11 @@ logging.basicConfig(
 def test_import(import_data, pth):
     '''
     test data import - this example is completed for you to assist with the other test functions
+    input:
+          import_data: method to test
+          pth: path file
+    output:
+          df_import: Dataframe    
     '''
     try:
         logging.info("INFO: Testing import_data asserts")
@@ -56,6 +61,12 @@ def test_import(import_data, pth):
 def test_eda(perform_eda, df_import, pth_folder_plot):
     '''
     test perform eda function
+    input:
+              perform_eda: method to test
+              df_import: dataframe
+              pth_folder_plot: path folder
+    output:
+              None
     '''
     try:
         logging.info("INFO: Testing perform_eda")
@@ -95,6 +106,14 @@ def test_eda(perform_eda, df_import, pth_folder_plot):
 def test_encoder_helper(encoder_helper, df_import, category_lst, response):
     '''
     test encoder helper
+    input:
+              perform_eda: method to test
+              df_import: dataframe
+              category_lst: list variables to encode
+              response: variable needed for encoding
+
+    output:
+              None
     '''
     try:
 
@@ -142,7 +161,8 @@ def test_encoder_helper(encoder_helper, df_import, category_lst, response):
             "SUCCESS: Testing test_encoder_helper: success performing new columns")
 
         # check if encoder_helper is not empty
-        assert encoder_return.shape[0] > 0 and encoder_return.shape[1] > 0, 'encoder_return not empty'
+        assert encoder_return.shape[0] > 0, 'encoder_return not empty'
+        assert encoder_return.shape[1] > 0,'encoder_return not empty'
         logging.info(
             "SUCCESS: Testing test_encoder_helper: encoder_return is not empty")
 
@@ -163,6 +183,13 @@ def test_perform_feature_engineering(
         perform_feature_engineering, df_import, keep_cols, response):
     '''
     test perform_feature_engineering
+    input:
+              X_train: X training data
+              X_test: X testing data
+              y_train: y training data
+              y_test: y testing data
+    output:
+              None
     '''
     try:
         logging.info("INFO: Testing test_perform_feature_engineering")
@@ -215,8 +242,16 @@ def test_perform_feature_engineering(
 
 def test_train_models(train_models, x_train, x_test, y_train, y_test):
     '''
-        test train_models
-        '''
+    test train_models
+    input:
+              train_models: method to test
+              x_train: x train data
+              X_test: X testing data
+              y_train: y training data
+              y_test: y testing data
+    output:
+              None
+    '''
     try:
         logging.info("INFO: Testing test_train_models asserts")
 

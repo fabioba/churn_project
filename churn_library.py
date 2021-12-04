@@ -2,7 +2,7 @@
 This module contains churn project
 
 Author: Fabio
-Date: Dec. 2021
+Date: 4 Dec. 2021
 """
 import pandas as pd
 import numpy as np
