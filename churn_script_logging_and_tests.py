@@ -21,18 +21,18 @@ def test_import(pth):
     test data import - this example is completed for you to assist with the other test functions
     '''
     try:
-        logging.info("INFO: test_import: {}".format(pth))
+        logging.info("INFO: import_data: {}".format(pth))
         df = cls.import_data(pth)
-        logging.info("Testing import_data: SUCCESS")
+        logging.info("SUCCESS: Testing import_data")
     except FileNotFoundError as err:
-        logging.error("Testing import_data: The file wasn't found")
+        logging.error("ERROR: Testing import_data: The file wasn't found: {}".format(err))
         raise err
 
     try:
         assert df.shape[0] > 0
         assert df.shape[1] > 0
     except AssertionError as err:
-        logging.error("Testing import_data: The file doesn't appear to have rows and columns")
+        logging.error("ERROR: Testing import_data: The file doesn't appear to have rows and columns")
         raise err
 
 
