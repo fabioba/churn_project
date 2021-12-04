@@ -249,15 +249,19 @@ def train_models(X_train, X_test, y_train, y_test):
                                 y_test_preds_lr,
                                 y_test_preds_rf)
     # 
-    lrc_plot = RocCurveDisplay(lrc, X_test, y_test)
+    lrc_plot = RocCurveDisplay.from_estimator(lrc, X_test, y_test)
+    lrc_plot.plot()
+
+    plt.savefig('images/results/lrc_plot.png')
+
     # plots
     plt.figure(figsize=(15, 8))
     ax = plt.gca()
-    ax.figure.savefig('images/results/gcs.png')
+    ax.figure.savefig('images/results/gca.png')
 
-    rfc_disp = RocCurveDisplay(cv_rfc.best_estimator_, X_test, y_test, ax=ax, alpha=0.8)
-    ax=rfc_disp.plot(ax=ax, alpha=0.8)
-    ax.figure.savefig('images/results/lrc.png')
+    rfc_disp = RocCurveDisplay.from_estimator(cv_rfc.best_estimator_, X_test, y_test, ax=ax, alpha=0.8)
+    rfc_disp.plot(ax=ax, alpha=0.8)
+    plt.savefig('images/results/rfc.png')
 
     # save best model
     joblib.dump(cv_rfc.best_estimator_, './models/rfc_model.pkl')

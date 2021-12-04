@@ -24,4 +24,3 @@ root - INFO - SUCCESS: Testing test_perform_feature_engineering splitting datafr
 root - INFO - SUCCESS: Testing test_perform_feature_engineering alla splitted dataframe populated
 root - INFO - INFO: Testing test_train_models asserts
 root - INFO - SUCCESS: Testing test_train_models asserts ok
-root - ERROR - ERROR: Testing test_train_models: error models: __init__() takes 1 positional argument but 4 were given
