@@ -17,7 +17,14 @@ from sklearn.metrics import classification_report
 import shap
 from sklearn.metrics import RocCurveDisplay
 import logging
+import os
 
+  
+logging.basicConfig(
+    filename='./logs/churn_library_prod.log',
+    level = logging.INFO,
+    filemode='w',
+    format='%(name)s - %(levelname)s - %(message)s')
 
 def import_data(pth):
     '''
@@ -29,11 +36,16 @@ def import_data(pth):
             df: pandas dataframe
     '''	
     try:
-        df=pd.read_csv(pth)
+        #create empty df
+        df=pd.DataFrame()
 
+        #check if paths exists
+        if os.path.exists(pth):
+            df=pd.read_csv(pth)
+            
         return df
     except BaseException as err:
-        print('ERROR: import_data: {}'.format(err))
+        logging.error('ERROR: import_data: {}'.format(err))
         return pd.DataFrame()
 
 
@@ -70,8 +82,9 @@ def perform_eda(df,path_folder_plot):
         ax=sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths = 2)
         path_plot=f'{path_folder_plot}/corr.png'
         ax.figure.savefig(path_plot)  
+
     except BaseException as err:
-        print('ERROR: perform_eda: {}'.format(err))
+        logging.error('ERROR: perform_eda: {}'.format(err))
 
 
 
@@ -88,25 +101,28 @@ def encoder_helper(df, category_lst, response):
     output:
             df: pandas dataframe with new columns for
     '''
-    try:   
+    try:  
+ 
 
-        #iterate over list of category variables
-        for cat in category_lst:
-            cat_lst = []
+        #check if category list is not empty and response is not null
+        if ((len(category_lst)>0) and (isinstance(response,object))):
+            #iterate over list of category variables
+            for cat in category_lst:
+                cat_lst = []
 
-            #group by current category and get mean of response variable (usually CHURN)
-            cat_groups = df.groupby(cat).mean()[response]
+                #group by current category and get mean of response variable (usually CHURN)
+                cat_groups = df.groupby(cat).mean()[response]
 
-            #create list of values
-            for val in df[cat]:
-                cat_lst.append(cat_groups.loc[val])
+                #create list of values
+                for val in df[cat]:
+                    cat_lst.append(cat_groups.loc[val])
 
-            #append current list as new column on input dataframe
-            df[f'{cat}_{response}'] = cat_lst 
+                #append current list as new column on input dataframe
+                df[f'{cat}_{response}'] = cat_lst 
 
         return df
     except BaseException as err:
-        print('ERROR: encoder_helper: {}'.format(err))
+        logging.error('ERROR: encoder_helper: {}'.format(err))
 
         #return empty dataframe
         return pd.DataFrame()
@@ -127,17 +143,30 @@ def perform_feature_engineering(df, keep_cols, response):
               y_test: y testing data
     '''
     try:
-        X = df[keep_cols]
-        y = df[response]
+        #create empty dataframes
+        X_train=pd.DataFrame() 
+        X_test=pd.DataFrame()
+        y_train=pd.DataFrame()
+        y_test= pd.DataFrame()
 
-        #split input dataframe
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.3, random_state=42)  
+        #check if keep cols is not null
+        if ((len(keep_cols)>0) and (isinstance(response,object))):
+            X = df[keep_cols]
+            y = df[response]
+
+            #split input dataframe
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.3, random_state=42)  
 
         #return dataframes
         return X_train, X_test, y_train, y_test
     except BaseException as err:
-        print('ERROR: perform_feature_engineering: {}'.format(err))
-        return pd.DataFrame(), pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+        logging.error('ERROR: perform_feature_engineering: {}'.format(err))
+        #create empty dataframes
+        X_train=pd.DataFrame() 
+        X_test=pd.DataFrame()
+        y_train=pd.DataFrame()
+        y_test= pd.DataFrame()
+        return X_train, X_test, y_train, y_test
         
 
     
@@ -163,18 +192,16 @@ def classification_report_image(y_train,
     output:
              None
     '''
-    # scores
-    print('random forest results')
-    print('test results')
-    print(classification_report(y_test, y_test_preds_rf))
-    print('train results')
-    print(classification_report(y_train, y_train_preds_rf))
+    try:
+        # scores
+        print(classification_report(y_test, y_test_preds_rf))
+        print(classification_report(y_train, y_train_preds_rf))
 
-    print('logistic regression results')
-    print('test results')
-    print(classification_report(y_test, y_test_preds_lr))
-    print('train results')
-    print(classification_report(y_train, y_train_preds_lr))
+
+        print(classification_report(y_test, y_test_preds_lr))
+        print(classification_report(y_train, y_train_preds_lr))
+    except BaseException as err:
+        logging.error(f'classification_report_image:{err}')
     
 
 def feature_importance_plot(model, X_data, output_pth):
@@ -212,7 +239,7 @@ def feature_importance_plot(model, X_data, output_pth):
 
         plt.savefig(output_pth)
     except BaseException as err:
-        print(err)
+        logging.error(f'feature_importance_plot:{err}')
 
 
 def train_models(X_train, X_test, y_train, y_test):
@@ -295,7 +322,7 @@ def train_models(X_train, X_test, y_train, y_test):
 
     # iterate over list of models
     for model_ in list_models:
-        print(model_)
+        
         plt.rc('figure', figsize=(5, 5))
         #plt.text(0.01, 0.05, str(model.summary()), {'fontsize': 12}) old approach
         plt.text(0.01, 1.25, str(f'{model_["name"]} Train'), {'fontsize': 10}, fontproperties = 'monospace')

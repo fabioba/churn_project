@@ -97,11 +97,13 @@ def test_eda(perform_eda,df,pth_folder_plot):
     except BaseException as err:
         logging.error("ERROR: Testing test_eda: error storing plots: {}".format(err))    
 
+
 def test_encoder_helper(encoder_helper,df, category_lst, response):
     '''
     test encoder helper
     '''
     try:
+        
         logging.info("INFO: Testing test_encoder_helper")
 
         #check size of dataframe
@@ -117,7 +119,7 @@ def test_encoder_helper(encoder_helper,df, category_lst, response):
         logging.info("SUCCESS: Testing test_encoder_helper: category list does not exist")
 
         #check if response is string
-        assert isinstance(response,str),'response variable is not string'
+        assert isinstance(response,object),'response variable is not string'
         logging.info("SUCCESS: Testing test_encoder_helper: response is string")
 
         #check if category list are columns in dataframe
@@ -138,6 +140,10 @@ def test_encoder_helper(encoder_helper,df, category_lst, response):
         encoder_return = encoder_helper(df,category_lst,response)
         logging.info("SUCCESS: Testing test_encoder_helper: success performing new columns")  
 
+        #check if encoder_helper is not empty
+        assert encoder_return.shape[0]>0 and encoder_return.shape[1]>0,'encoder_return not empty'
+        logging.info("SUCCESS: Testing test_encoder_helper: encoder_return is not empty")  
+
         #check if encoder_helper method created Churn columns
         assert all(f'{elem}_{response}' in list(encoder_return.columns) for elem in category_lst),'churn columns not created'
         logging.info("SUCCESS: Testing test_encoder_helper: all churn columns created correctly")  
@@ -145,7 +151,9 @@ def test_encoder_helper(encoder_helper,df, category_lst, response):
         return encoder_return
     except AssertionError as err:
         logging.error("ERROR: Testing test_encoder_helper: {}".format(err))    
-       
+        #return empty df
+        return pd.DataFrame()
+
     except BaseException as err :
 
         logging.error("ERROR: Testing test_encoder_helper:  {}".format(err))    
@@ -193,12 +201,21 @@ def test_perform_feature_engineering(perform_feature_engineering,df,keep_cols,re
 
     except AssertionError as err:
         logging.error("ERROR: Testing test_perform_feature_engineering: error assertion: {}".format(err))    
+        X_train=pd.DataFrame() 
+        X_test=pd.DataFrame()
+        y_train=pd.DataFrame()
+        y_test= pd.DataFrame()
+        #return empty dataframe
+        return X_train, X_test, y_train, y_test
 
     except BaseException as err:
         logging.error("ERROR: Testing test_perform_feature_engineering: error splitting dataframe: {}".format(err))
-
+        X_train=pd.DataFrame() 
+        X_test=pd.DataFrame()
+        y_train=pd.DataFrame()
+        y_test= pd.DataFrame()
         #return empty dataframe
-        return pd.DataFrame(), pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+        return X_train, X_test, y_train, y_test
 
 
 def test_train_models(train_models,X_train, X_test, y_train, y_test):
@@ -221,7 +238,18 @@ def test_train_models(train_models,X_train, X_test, y_train, y_test):
        # train models
         train_models(X_train, X_test, y_train, y_test)
         logging.info("SUCCESS: Testing test_train_models model trained correctly")
-      
+
+        #check if images are stored
+        assert os.path.exists('images/results/lrc_plot.png')==True,'path does not exist'
+        assert os.path.exists('images/results/gca.png')==True,'path does not exist'
+        assert os.path.exists('images/results/rfc.png')==True,'path does not exist'
+        assert os.path.exists('images/eda/shap_summary.png')==True,'path does not exist'
+        # check if models are stored
+        assert os.path.exists('./models/rfc_model.pkl')==True,'path does not exist'
+        assert os.path.exists('./models/logistic_model.pkl')==True,'path does not exist'
+
+
+    
     except AssertionError as err:
         logging.error("ERROR: Testing test_train_models: error assertion: {}".format(err))  
 
