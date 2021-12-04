@@ -1,5 +1,2 @@
-root - INFO - INFO: Testing test_perform_feature_engineering
-root - INFO - SUCCESS: Testing test_perform_feature_engineering: dataframe shape > 0
-root - ERROR - ERROR: Testing test_perform_feature_engineering: error assertion: keep cols are not in dataframe
-root - INFO - INFO: Testing test_perform_feature_engineering splitting dataframe
-root - ERROR - ERROR: Testing test_perform_feature_engineering: error splitting dataframe: perform_feature_engineering() missing 1 required positional argument: 'response'
+root - INFO - INFO: Testing import_data asserts
+root - INFO - SUCCESS: Testing import_data read file

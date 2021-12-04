@@ -24,17 +24,20 @@ def test_import(pth,import_data):
     test data import - this example is completed for you to assist with the other test functions
     '''
     try:
-        logging.info("INFO: Testing import_data")
+        logging.info("INFO: Testing import_data asserts")
 
-        df=import_data(pth)    
-
-            
-        logging.info("SUCCESS: Testing import_data read file")
+        assert os.path.exists(pth)==True, 'path does not exist'
 
 
     except FileNotFoundError as err:
         logging.error("ERROR: Testing import_data: The file wasn't found: {}".format(err))
  
+    try:
+        logging.info("SUCCESS: Testing import_data read file")
+        return import_data(pth)    
+
+    except BaseException as err:
+        logging.error("ERROR: Testing import_data error reading file: {}".format(err))
 
     try:
         assert df.shape[0] > 0
@@ -117,7 +120,8 @@ def test_encoder_helper(encoder_helper,df, category_lst, response):
         logging.error("ERROR: Testing test_encoder_helper: error: {}".format(err))    
 
     try:
-        encoder_helper(df,category_lst,response)
+        # test method
+        return encoder_helper(df,category_lst,response)
         logging.info("SUCCESS: Testing test_encoder_helper: success performing new columns")    
 
     except:
@@ -155,26 +159,65 @@ def test_perform_feature_engineering(perform_feature_engineering,df,keep_cols,re
     try:
         logging.info("INFO: Testing test_perform_feature_engineering splitting dataframe")
 
-        perform_feature_engineering(df,response)
+        perform_feature_engineering(df,keep_cols,response)
 
     except BaseException as err:
         logging.error("ERROR: Testing test_perform_feature_engineering: error splitting dataframe: {}".format(err))    
 
 
-def test_train_models(train_models):
-	'''
+def test_train_models(train_models,X_train, X_test, y_train, y_test):
+    '''
 	test train_models
 	'''
+    try:
+        logging.info("INFO: Testing test_train_models asserts")
+
+        #check size of dataframe
+        assert all([True if elem > 0 else False for elem in X_train.shape]), "X_train shape>0"
+        #check size of dataframe
+        assert all([True if elem > 0 else False for elem in X_test.shape]), "X_test shape>0"
+        #check size of dataframe
+        assert all([True if elem > 0 else False for elem in y_train.shape]), "y_train shape>0"        
+        #check size of dataframe
+        assert all([True if elem > 0 else False for elem in y_test.shape]), "y_test shape>0"
+    
+    except AssertionError as err:
+        logging.error("ERROR: Testing test_train_models: error assertion: {}".format(err))  
+
+    try:
+
+        logging.info("INFO: Testing test_train_models")
+        train_models(X_train, X_test, y_train, y_test)  
+
+    except BaseException as err:
+        logging.error("ERROR: Testing test_train_models: error models: {}".format(err))  
+
+    
+
 
 
 if __name__ == "__main__":
-	#test_import('data/bank_data.csv',cls.import_data)
-    df=cls.import_data('data/bank_data.csv') 
+    df=test_import('data/bank_data.csv',cls.import_data)
     df['Churn'] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
 
     #test_eda(df,cls.perform_eda,'images/eda/')
     #test_encoder_helper(cls.encoder_helper,df,['Gender','Education_Level','Marital_Status','Income_Category','Card_Category'],'Churn')
+    category_lst=['Gender','Education_Level','Marital_Status','Income_Category','Card_Category']
     response='Churn'
+    for cat in category_lst:
+        cat_lst = []
+
+        #group by current category and get mean of response variable (usually CHURN)
+        cat_groups = df.groupby(cat).mean()[response]
+
+        #create list of values
+        for val in df[cat]:
+                cat_lst.append(cat_groups.loc[val])
+
+        #append current list as new column on input dataframe
+        df[f'{cat}_{response}'] = cat_lst 
+
+    
     keep_cols = ['Customer_Age', 'Dependent_count', 'Months_on_book',
              'Total_Relationship_Count', 'Months_Inactive_12_mon',
              'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
@@ -182,8 +225,8 @@ if __name__ == "__main__":
              'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio',
              'Gender_Churn', 'Education_Level_Churn', 'Marital_Status_Churn', 
              'Income_Category_Churn', 'Card_Category_Churn']
-    X_train, X_test, y_train, y_test=test_perform_feature_engineering(cls.perform_feature_engineering,df,keep_cols,response)
-
+    X_train, X_test, y_train, y_test=cls.perform_feature_engineering(df,keep_cols,response)
+    #test_train_models(cls.train_models,X_train, X_test, y_train, y_test)
 
 
 

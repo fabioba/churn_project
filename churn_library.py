@@ -13,9 +13,9 @@ import joblib
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import plot_roc_curve, classification_report
+from sklearn.metrics import classification_report
 import shap
-
+from sklearn.metrics import RocCurveDisplay
 
 def import_data(pth):
     '''
@@ -223,15 +223,15 @@ def train_models(X_train, X_test, y_train, y_test):
                                 y_test_preds_lr,
                                 y_test_preds_rf)
     # 
-    lrc_plot = plot_roc_curve(lrc, X_test, y_test)
+    lrc_plot = RocCurveDisplay(lrc, X_test, y_test)
     # plots
     plt.figure(figsize=(15, 8))
     ax = plt.gca()
-    ax.savefig('images/result/gcs.png')
+    ax.savefig('images/results/gcs.png')
 
-    rfc_disp = plot_roc_curve(cv_rfc.best_estimator_, X_test, y_test, ax=ax, alpha=0.8)
+    rfc_disp = RocCurveDisplay(cv_rfc.best_estimator_, X_test, y_test, ax=ax, alpha=0.8)
     ax=lrc_plot.plot(ax=ax, alpha=0.8)
-    ax.savefig('images/result/lrc.png')
+    ax.savefig('images/results/lrc.png')
 
     # save best model
     joblib.dump(cv_rfc.best_estimator_, './models/rfc_model.pkl')
@@ -245,17 +245,17 @@ def train_models(X_train, X_test, y_train, y_test):
 
     plt.figure(figsize=(15, 8))
     ax = plt.gca()
-    ax.savefig('images/result/gca.png')
+    ax.savefig('images/results/gca.png')
 
     rfc_disp = plot_roc_curve(rfc_model, X_test, y_test, ax=ax, alpha=0.8)
     ax=lrc_plot.plot(ax=ax, alpha=0.8)
-    ax.savefig('images/result/lrcs.png')
+    ax.savefig('images/results/lrcs.png')
 
     # shape values
     explainer = shap.TreeExplainer(cv_rfc.best_estimator_)
     shap_values = explainer.shap_values(X_test)
     ax=shap.summary_plot(shap_values, X_test, plot_type="bar")
-    ax.savefig('images/result/shap.png')
+    ax.savefig('images/results/shap.png')
 
 
     # iterate over list of models
@@ -269,7 +269,7 @@ def train_models(X_train, X_test, y_train, y_test):
     for model_ in list_models:
 
         # feature importance
-        feature_importance_plot(rfc_model,X_train,'images/result/')
+        feature_importance_plot(rfc_model,X_train,'images/results/')
 
         plt.rc('figure', figsize=(5, 5))
         #plt.text(0.01, 0.05, str(model.summary()), {'fontsize': 12}) old approach
@@ -278,8 +278,8 @@ def train_models(X_train, X_test, y_train, y_test):
         plt.text(0.01, 0.6, str(f'{model_["name"]}Test'), {'fontsize': 10}, fontproperties = 'monospace')
         plt.text(0.01, 0.7, str(classification_report(y_train, model_['y_train'])), {'fontsize': 10}, fontproperties = 'monospace') # approach improved by OP -> monospace!
         ax=plt.show()
-        ax.savefig(f'images/result/{model_}.png')
+        ax.savefig(f'images/results/{model_}.png')
 
 
 if __name__ == "__main__":
-	import_data('ok')
+	import_data('data/bank_data.csv')
