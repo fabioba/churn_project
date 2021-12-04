@@ -18,11 +18,6 @@ import shap
 from sklearn.metrics import RocCurveDisplay
 import logging
 
-logging.basicConfig(
-    filename='./logs/churn_library_prod.log',
-    level = logging.INFO,
-    filemode='w',
-    format='%(name)s - %(levelname)s - %(message)s')
 
 def import_data(pth):
     '''
@@ -38,7 +33,7 @@ def import_data(pth):
 
         return df
     except BaseException as err:
-        logging.error('ERROR: import_data: {}'.format(err))
+        print('ERROR: import_data: {}'.format(err))
         return pd.DataFrame()
 
 
@@ -76,7 +71,7 @@ def perform_eda(df,path_folder_plot):
         path_plot=f'{path_folder_plot}/corr.png'
         ax.figure.savefig(path_plot)  
     except BaseException as err:
-        logging.error('ERROR: perform_eda: {}'.format(err))
+        print('ERROR: perform_eda: {}'.format(err))
 
 
 
@@ -93,7 +88,8 @@ def encoder_helper(df, category_lst, response):
     output:
             df: pandas dataframe with new columns for
     '''
-    try:
+    try:   
+
         #iterate over list of category variables
         for cat in category_lst:
             cat_lst = []
@@ -105,12 +101,12 @@ def encoder_helper(df, category_lst, response):
             for val in df[cat]:
                 cat_lst.append(cat_groups.loc[val])
 
-                #append current list as new column on input dataframe
-                df[f'{cat}_{response}'] = cat_lst 
+            #append current list as new column on input dataframe
+            df[f'{cat}_{response}'] = cat_lst 
 
         return df
     except BaseException as err:
-        logging.error('ERROR: encoder_helper: {}'.format(err))
+        print('ERROR: encoder_helper: {}'.format(err))
 
         #return empty dataframe
         return pd.DataFrame()
@@ -140,7 +136,7 @@ def perform_feature_engineering(df, keep_cols, response):
         #return dataframes
         return X_train, X_test, y_train, y_test
     except BaseException as err:
-        logging.error('ERROR: perform_feature_engineering: {}'.format(err))
+        print('ERROR: perform_feature_engineering: {}'.format(err))
         return pd.DataFrame(), pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
         
 
@@ -257,11 +253,11 @@ def train_models(X_train, X_test, y_train, y_test):
     # plots
     plt.figure(figsize=(15, 8))
     ax = plt.gca()
-    ax.savefig('images/results/gcs.png')
+    ax.figure.savefig('images/results/gcs.png')
 
     rfc_disp = RocCurveDisplay(cv_rfc.best_estimator_, X_test, y_test, ax=ax, alpha=0.8)
-    ax=lrc_plot.plot(ax=ax, alpha=0.8)
-    ax.savefig('images/results/lrc.png')
+    ax=rfc_disp.plot(ax=ax, alpha=0.8)
+    ax.figure.savefig('images/results/lrc.png')
 
     # save best model
     joblib.dump(cv_rfc.best_estimator_, './models/rfc_model.pkl')
@@ -275,17 +271,17 @@ def train_models(X_train, X_test, y_train, y_test):
 
     plt.figure(figsize=(15, 8))
     ax = plt.gca()
-    ax.savefig('images/results/gca.png')
+    ax.figure.savefig('images/results/gca.png')
 
     rfc_disp = RocCurveDisplay(rfc_model, X_test, y_test, ax=ax, alpha=0.8)
     ax=lrc_plot.plot(ax=ax, alpha=0.8)
-    ax.savefig('images/results/lrcs.png')
+    ax.figure.savefig('images/results/lrcs.png')
 
     # shape values
     explainer = shap.TreeExplainer(cv_rfc.best_estimator_)
     shap_values = explainer.shap_values(X_test)
     ax=shap.summary_plot(shap_values, X_test, plot_type="bar")
-    ax.savefig('images/results/shap.png')
+    ax.figure.savefig('images/results/shap.png')
 
 
     # iterate over list of models
@@ -308,14 +304,14 @@ def train_models(X_train, X_test, y_train, y_test):
         plt.text(0.01, 0.6, str(f'{model_["name"]}Test'), {'fontsize': 10}, fontproperties = 'monospace')
         plt.text(0.01, 0.7, str(classification_report(y_train, model_['y_train'])), {'fontsize': 10}, fontproperties = 'monospace') # approach improved by OP -> monospace!
         ax=plt.show()
-        ax.savefig(f'images/results/{model_["name"]}.png')
+        ax.figure.savefig(f'images/results/{model_["name"]}.png')
 
 
 if __name__ == "__main__":
     df=import_data('data/bank_data.csv')
         
     #perform eda
-    perform_eda(df,'images/eda/')
+    perform_eda(df,'images/eda')
 
     # encode   
     df_encode=encoder_helper(df,['Gender','Education_Level','Marital_Status','Income_Category','Card_Category'],'Churn')

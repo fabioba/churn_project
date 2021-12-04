@@ -131,22 +131,24 @@ def test_encoder_helper(encoder_helper,df, category_lst, response):
 
 
     except AssertionError as err:
-        logging.error("ERROR: Testing test_encoder_helper: error: {}".format(err))    
+        logging.error("ERROR: Testing test_encoder_helper: {}".format(err))    
 
     try:
         # test method
         encoder_return = encoder_helper(df,category_lst,response)
         logging.info("SUCCESS: Testing test_encoder_helper: success performing new columns")  
 
-
         #check if encoder_helper method created Churn columns
-        assert all(f'{elem}_{response}' in list(df.columns) for elem in category_lst),'churn columns not created'
+        assert all(f'{elem}_{response}' in list(encoder_return.columns) for elem in category_lst),'churn columns not created'
         logging.info("SUCCESS: Testing test_encoder_helper: all churn columns created correctly")  
 
         return encoder_return
+    except AssertionError as err:
+        logging.error("ERROR: Testing test_encoder_helper: {}".format(err))    
+       
     except BaseException as err :
 
-        logging.error("ERROR: Testing test_encoder_helper: error performing new columns: {}".format(err))    
+        logging.error("ERROR: Testing test_encoder_helper:  {}".format(err))    
         #return empty df
         return pd.DataFrame()
 
@@ -216,6 +218,7 @@ def test_train_models(train_models,X_train, X_test, y_train, y_test):
         assert all([True if elem > 0 else False for elem in y_test.shape]), "y_test shape>0"
         logging.info("SUCCESS: Testing test_train_models asserts ok")
        
+       # train models
         train_models(X_train, X_test, y_train, y_test)
         logging.info("SUCCESS: Testing test_train_models model trained correctly")
       
@@ -240,16 +243,17 @@ if __name__ == "__main__":
     test_encoder_helper(cls.encoder_helper,df,['Gender','Education_Level','Marital_Status','Income_Category','Card_Category'],'Churn')
 
     #test perform feature engineering    
-    #X_train, X_test, y_train, y_test=cls.perform_feature_engineering(df,['Customer_Age', 'Dependent_count', 'Months_on_book',
-    #         'Total_Relationship_Count', 'Months_Inactive_12_mon',
-    #         'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
-    #         'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt',
-    #         'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio',
-    #         'Gender_Churn', 'Education_Level_Churn', 'Marital_Status_Churn', 
-    #         'Income_Category_Churn', 'Card_Category_Churn'],'Churn')
+    X_train, X_test, y_train, y_test=test_perform_feature_engineering(cls.perform_feature_engineering,
+            df,['Customer_Age', 'Dependent_count', 'Months_on_book',
+             'Total_Relationship_Count', 'Months_Inactive_12_mon',
+             'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
+             'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt',
+             'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio',
+             'Gender_Churn', 'Education_Level_Churn', 'Marital_Status_Churn', 
+             'Income_Category_Churn', 'Card_Category_Churn'],'Churn')
 
     # test train model
-    #test_train_models(cls.train_models,X_train, X_test, y_train, y_test)
+    test_train_models(cls.train_models,X_train, X_test, y_train, y_test)
 
 
 
