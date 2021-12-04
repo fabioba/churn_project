@@ -5,7 +5,8 @@ Author: Fabio
 Date: Dec. 2021
 """
 import pandas as pd
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def import_data(pth):
@@ -17,12 +18,10 @@ def import_data(pth):
     output:
             df: pandas dataframe
     '''	
-    df = pd.read_csv(pth)
-    
-    return df
+    return pd.read_csv(pth)
 
 
-def perform_eda(df):
+def perform_eda(df,path_folder_plot):
     '''
     perform eda on df and save figures to images folder
     input:
@@ -31,7 +30,28 @@ def perform_eda(df):
     output:
             None
     '''
-    pass
+    df['Churn'] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
+
+
+    plt.figure(figsize=(20,10)) 
+    ax=df['Churn'].hist()
+    path_plot=f'{path_folder_plot}/churn_hist.png'
+    ax.figure.savefig(path_plot)
+
+    plt.figure(figsize=(20,10))        
+    ax=df.Marital_Status.value_counts('normalize').plot(kind='bar')
+    path_plot=f'{path_folder_plot}/Marital_Status_bar.png'
+    ax.figure.savefig(path_plot)
+
+    plt.figure(figsize=(20,10)) 
+    ax=sns.distplot(df['Total_Trans_Ct'])
+    path_plot=f'{path_folder_plot}/Total_Trans_Ct_bar.png'
+    ax.figure.savefig(path_plot)
+
+    plt.figure(figsize=(20,10)) 
+    ax=sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths = 2)
+    path_plot=f'{path_folder_plot}/corr.png'
+    ax.figure.savefig(path_plot)    
 
 
 def encoder_helper(df, category_lst, response):

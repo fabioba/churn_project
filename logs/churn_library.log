@@ -1,2 +1,4 @@
-root - INFO - INFO: test_import: ok
-root - ERROR - Testing import_eda: The file wasn't found
+root - INFO - INFO: Testing perform_eda
+root - INFO - SUCCESS: Testing perform_eda: dataframe shape > 0
+root - INFO - SUCCESS: Testing perform_eda: no NULL values in input dataframe
+root - INFO - SUCCESS: Testing perform_eda: plot folder exists
