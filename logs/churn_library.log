@@ -1,4 +1,8 @@
-root - INFO - INFO: Testing perform_eda
-root - INFO - SUCCESS: Testing perform_eda: dataframe shape > 0
-root - INFO - SUCCESS: Testing perform_eda: no NULL values in input dataframe
-root - INFO - SUCCESS: Testing perform_eda: plot folder exists
+root - INFO - INFO: Testing test_encoder_helper
+root - INFO - SUCCESS: Testing test_encoder_helper: dataframe shape > 0
+root - INFO - SUCCESS: Testing test_encoder_helper: no NULL values in input dataframe
+root - INFO - SUCCESS: Testing test_encoder_helper: category list does not exist
+root - INFO - SUCCESS: Testing test_encoder_helper: response is string
+root - INFO - SUCCESS: Testing test_encoder_helper: category list are columns in dataframe
+root - INFO - SUCCESS: Testing test_encoder_helper: response refers to a columns in dataframe
+root - INFO - SUCCESS: Testing test_encoder_helper: success performing new columns

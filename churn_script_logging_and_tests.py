@@ -67,25 +67,93 @@ def test_eda(df,perform_eda,pth_folder_plot):
         logging.info("SUCCESS: Testing perform_eda: plot folder exists")
 
 
+    except AssertionError as err:
+        logging.error("ERROR: test_eda: {}".format(err)) 
+
+    try:
+
         perform_eda(df,pth_folder_plot)
 
-        
+        logging.info("SUCCESS: Testing perform_eda: plot stored in folder")
+
+    except BaseException as err:
+        logging.error("ERROR: Testing test_eda: error storing plots: {}".format(err))    
+
+def test_encoder_helper(encoder_helper,df, category_lst, response):
+    '''
+    test encoder helper
+    '''
+    try:
+        logging.info("INFO: Testing test_encoder_helper")
+
+        #check size of dataframe
+        assert all([True if elem > 0 else False for elem in df.shape])
+
+        logging.info("SUCCESS: Testing test_encoder_helper: dataframe shape > 0")
+
+        #check if exists any null values
+        assert df.isnull().sum().sum()==0
+        logging.info("SUCCESS: Testing test_encoder_helper: no NULL values in input dataframe")
+
+        #check if category_lst exist
+        assert len(category_lst)>0
+        logging.info("SUCCESS: Testing test_encoder_helper: category list does not exist")
+
+        #check if response is string
+        assert isinstance(response,str)
+        logging.info("SUCCESS: Testing test_encoder_helper: response is string")
+
+        #check if category list are columns in dataframe
+        assert all(elem in list(df.columns)  for elem in category_lst)
+        logging.info("SUCCESS: Testing test_encoder_helper: category list are columns in dataframe")
+
+        #check if response refers to a column in dataframe
+        assert response in list(df.columns)
+        logging.info("SUCCESS: Testing test_encoder_helper: response refers to a columns in dataframe")
+
 
 
     except AssertionError as err:
-        logging.error("ERROR: dataframe does not exist: {}".format(err))     
+        logging.error("ERROR: Testing test_encoder_helper: error: {}".format(err))    
+
+    try:
+        encoder_helper(df,category_lst,response)
+        logging.info("SUCCESS: Testing test_encoder_helper: success performing new columns")    
+
+    except:
+        logging.error("ERROR: Testing test_encoder_helper: error performing new columns: {}".format(err))    
+
+
+
     
 
-def test_encoder_helper(encoder_helper):
-	'''
-	test encoder helper
-	'''
 
+def test_perform_feature_engineering(perform_feature_engineering,df,response):
+    '''
+    test perform_feature_engineering
+    '''
+    try:
+        logging.info("INFO: Testing test_perform_feature_engineering")
 
-def test_perform_feature_engineering(perform_feature_engineering):
-	'''
-	test perform_feature_engineering
-	'''
+        #check size of dataframe
+        assert all([True if elem > 0 else False for elem in df.shape])
+
+        logging.info("SUCCESS: Testing test_perform_feature_engineering: dataframe shape > 0")
+
+        #check if response is string
+        assert isinstance(response,str)
+        logging.info("SUCCESS: Testing test_perform_feature_engineering: response is string")
+
+    except AssertionError as err:
+        logging.error("ERROR: Testing test_perform_feature_engineering: error assertion: {}".format(err))    
+
+    try:
+        logging.info("INFO: Testing test_perform_feature_engineering splitting dataframe")
+
+        perform_feature_engineering(df,response)
+
+    except:
+        logging.error("ERROR: Testing test_perform_feature_engineering: error splitting dataframe: {}".format(err))    
 
 
 def test_train_models(train_models):
@@ -97,8 +165,12 @@ def test_train_models(train_models):
 if __name__ == "__main__":
 	#test_import('data/bank_data.csv',cls.import_data)
     df=cls.import_data('data/bank_data.csv') 
-    test_eda(df,cls.perform_eda,'images/eda/')
+    df['Churn'] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
 
+    #test_eda(df,cls.perform_eda,'images/eda/')
+    #test_encoder_helper(cls.encoder_helper,df,['Gender','Education_Level','Marital_Status','Income_Category','Card_Category'],'Churn')
+    response='Churn'
+    test_perform_feature_engineering(cls.perform_feature_engineering,df,response)
 
 
 
