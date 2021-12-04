@@ -24,3 +24,4 @@ root - INFO - SUCCESS: Testing test_perform_feature_engineering splitting datafr
 root - INFO - SUCCESS: Testing test_perform_feature_engineering alla splitted dataframe populated
 root - INFO - INFO: Testing test_train_models asserts
 root - INFO - SUCCESS: Testing test_train_models asserts ok
+root - INFO - SUCCESS: Testing test_train_models model trained correctly

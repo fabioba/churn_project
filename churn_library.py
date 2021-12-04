@@ -179,7 +179,7 @@ def classification_report_image(y_train,
 
 def feature_importance_plot(model, X_data, output_pth):
     '''
-    creates and stores the feature importances in pth
+        creates and stores the feature importances in pth
     input:
             model: model object containing feature_importances_
             X_data: pandas dataframe of X values
@@ -187,27 +187,32 @@ def feature_importance_plot(model, X_data, output_pth):
 
     output:
              None
-    '''
-    # Calculate feature importances
-    importances = model.best_estimator_.feature_importances_
-    # Sort feature importances in descending order
-    indices = np.argsort(importances)[::-1]
+             '''
+    try:
+        # Calculate feature importances
+        importances = model.best_estimator_.feature_importances_
+        # Sort feature importances in descending order
+        indices = np.argsort(importances)[::-1]
+        
+        # Rearrange feature names so they match the sorted feature importances
+        names = [X_data.columns[i] for i in indices]
 
-    # Rearrange feature names so they match the sorted feature importances
-    names = [X_data.columns[i] for i in indices]
+        # Create plot
+        plt.figure(figsize=(20,5))
 
-    # Create plot
-    plt.figure(figsize=(20,5))
+        # Create plot title
+        plt.title("Feature Importance")
+        plt.ylabel('Importance')
 
-    # Create plot title
-    plt.title("Feature Importance")
-    plt.ylabel('Importance')
+        # Add bars
+        plt.bar(range(X_data.shape[1]), importances[indices])
 
-    # Add bars
-    plt.bar(range(X_data.shape[1]), importances[indices])
+        # Add feature names as x-axis labels
+        plt.xticks(range(X_data.shape[1]), names, rotation=90)
 
-    # Add feature names as x-axis labels
-    plt.xticks(range(X_data.shape[1]), names, rotation=90)
+        plt.savefig(output_pth)
+    except BaseException as err:
+        print(err)
 
 
 def train_models(X_train, X_test, y_train, y_test):
@@ -271,22 +276,14 @@ def train_models(X_train, X_test, y_train, y_test):
     rfc_model = joblib.load('./models/rfc_model.pkl')
     lr_model = joblib.load('./models/logistic_model.pkl')
 
-    lrc_plot = RocCurveDisplay(lr_model, X_test, y_test)
-
-    plt.figure(figsize=(15, 8))
-    ax = plt.gca()
-    ax.figure.savefig('images/results/gca.png')
-
-    rfc_disp = RocCurveDisplay(rfc_model, X_test, y_test, ax=ax, alpha=0.8)
-    ax=lrc_plot.plot(ax=ax, alpha=0.8)
-    ax.figure.savefig('images/results/lrcs.png')
-
     # shape values
     explainer = shap.TreeExplainer(cv_rfc.best_estimator_)
     shap_values = explainer.shap_values(X_test)
-    ax=shap.summary_plot(shap_values, X_test, plot_type="bar")
-    ax.figure.savefig('images/results/shap.png')
+    shap.summary_plot(shap_values, X_test, plot_type="bar")
+    plt.savefig('images/eda/shap_summary.png')
 
+    # feature importance
+    feature_importance_plot(cv_rfc,X_train,f'images/results/cv_rfc.png')
 
     # iterate over list of models
     list_models=[{'name':'Logistic_Regressions','model':lr_model,
@@ -296,19 +293,16 @@ def train_models(X_train, X_test, y_train, y_test):
                         'y_test':y_test_preds_rf,
                         'y_train':y_train_preds_rf}]
 
+    # iterate over list of models
     for model_ in list_models:
-
-        # feature importance
-        feature_importance_plot(model_['model'],X_train,'images/results/')
-
+        print(model_)
         plt.rc('figure', figsize=(5, 5))
         #plt.text(0.01, 0.05, str(model.summary()), {'fontsize': 12}) old approach
         plt.text(0.01, 1.25, str(f'{model_["name"]} Train'), {'fontsize': 10}, fontproperties = 'monospace')
         plt.text(0.01, 0.05, str(classification_report(y_test, model_['y_test'])), {'fontsize': 10}, fontproperties = 'monospace') # approach improved by OP -> monospace!
         plt.text(0.01, 0.6, str(f'{model_["name"]}Test'), {'fontsize': 10}, fontproperties = 'monospace')
         plt.text(0.01, 0.7, str(classification_report(y_train, model_['y_train'])), {'fontsize': 10}, fontproperties = 'monospace') # approach improved by OP -> monospace!
-        ax=plt.show()
-        ax.figure.savefig(f'images/results/{model_["name"]}.png')
+        plt.savefig(f'images/results/{model_["name"]}.png')
 
 
 if __name__ == "__main__":
