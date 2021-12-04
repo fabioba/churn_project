@@ -16,6 +16,13 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 import shap
 from sklearn.metrics import RocCurveDisplay
+import logging
+
+logging.basicConfig(
+    filename='./logs/churn_library_prod.log',
+    level = logging.INFO,
+    filemode='w',
+    format='%(name)s - %(levelname)s - %(message)s')
 
 def import_data(pth):
     '''
@@ -26,7 +33,13 @@ def import_data(pth):
     output:
             df: pandas dataframe
     '''	
-    return pd.read_csv(pth)
+    try:
+        df=pd.read_csv(pth)
+
+        return df
+    except BaseException as err:
+        logging.error('ERROR: import_data: {}'.format(err))
+        return pd.DataFrame()
 
 
 def perform_eda(df,path_folder_plot):
@@ -38,36 +51,39 @@ def perform_eda(df,path_folder_plot):
     output:
             None
     '''
+    try:
+        #create binary variable
+        df['Churn'] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
 
-    #create binary variable
-    df['Churn'] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
+        #perform plots and store in folder
+        plt.figure(figsize=(20,10)) 
+        ax=df['Churn'].hist()
+        path_plot=f'{path_folder_plot}/churn_hist.png'
+        ax.figure.savefig(path_plot)
 
-    #perform plots and store in folder
-    plt.figure(figsize=(20,10)) 
-    ax=df['Churn'].hist()
-    path_plot=f'{path_folder_plot}/churn_hist.png'
-    ax.figure.savefig(path_plot)
+        plt.figure(figsize=(20,10))        
+        ax=df.Marital_Status.value_counts('normalize').plot(kind='bar')
+        path_plot=f'{path_folder_plot}/Marital_Status_bar.png'
+        ax.figure.savefig(path_plot)
 
-    plt.figure(figsize=(20,10))        
-    ax=df.Marital_Status.value_counts('normalize').plot(kind='bar')
-    path_plot=f'{path_folder_plot}/Marital_Status_bar.png'
-    ax.figure.savefig(path_plot)
+        plt.figure(figsize=(20,10)) 
+        ax=sns.distplot(df['Total_Trans_Ct'])
+        path_plot=f'{path_folder_plot}/Total_Trans_Ct_bar.png'
+        ax.figure.savefig(path_plot)
 
-    plt.figure(figsize=(20,10)) 
-    ax=sns.distplot(df['Total_Trans_Ct'])
-    path_plot=f'{path_folder_plot}/Total_Trans_Ct_bar.png'
-    ax.figure.savefig(path_plot)
+        plt.figure(figsize=(20,10)) 
+        ax=sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths = 2)
+        path_plot=f'{path_folder_plot}/corr.png'
+        ax.figure.savefig(path_plot)  
+    except BaseException as err:
+        logging.error('ERROR: perform_eda: {}'.format(err))
 
-    plt.figure(figsize=(20,10)) 
-    ax=sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths = 2)
-    path_plot=f'{path_folder_plot}/corr.png'
-    ax.figure.savefig(path_plot)    
 
 
 def encoder_helper(df, category_lst, response):
     '''
     helper function to turn each categorical column into a new column with
-    propotion of churn for each category - associated with cell 15 from the notebook
+    proportion of churn for each category - associated with cell 15 from the notebook
 
     input:
             df: pandas dataframe
@@ -77,22 +93,25 @@ def encoder_helper(df, category_lst, response):
     output:
             df: pandas dataframe with new columns for
     '''
+    try:
+        #iterate over list of category variables
+        for cat in category_lst:
+            cat_lst = []
 
-    #iterate over list of category variables
-    for cat in category_lst:
-        cat_lst = []
+            #group by current category and get mean of response variable (usually CHURN)
+            cat_groups = df.groupby(cat).mean()[response]
 
-        #group by current category and get mean of response variable (usually CHURN)
-        cat_groups = df.groupby(cat).mean()[response]
-
-        #create list of values
-        for val in df[cat]:
+            #create list of values
+            for val in df[cat]:
                 cat_lst.append(cat_groups.loc[val])
 
-        #append current list as new column on input dataframe
-        df[f'{cat}_{response}'] = cat_lst 
+                #append current list as new column on input dataframe
+                df[f'{cat}_{response}'] = cat_lst 
 
-    return df
+        return df
+    except BaseException as err:
+        logging.error('ERROR: encoder_helper: {}'.format(err))
+
 
 
 def perform_feature_engineering(df, keep_cols, response):
@@ -108,13 +127,21 @@ def perform_feature_engineering(df, keep_cols, response):
               y_train: y training data
               y_test: y testing data
     '''
+    try:
+        X = df[keep_cols]
+        y = df[response]
 
-    X = df[keep_cols]
-    y = df[response]
+        #split input dataframe
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.3, random_state=42)  
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.3, random_state=42)  
+        #return dataframes
+        return X_train, X_test, y_train, y_test
+    except BaseException as err:
+        logging.error('ERROR: perform_feature_engineering: {}'.format(err))
+        return pd.DataFrame(), pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+        
 
-    return X_train, X_test, y_train, y_test
+    
 
 
 def classification_report_image(y_train,
@@ -241,13 +268,13 @@ def train_models(X_train, X_test, y_train, y_test):
     rfc_model = joblib.load('./models/rfc_model.pkl')
     lr_model = joblib.load('./models/logistic_model.pkl')
 
-    lrc_plot = plot_roc_curve(lr_model, X_test, y_test)
+    lrc_plot = RocCurveDisplay(lr_model, X_test, y_test)
 
     plt.figure(figsize=(15, 8))
     ax = plt.gca()
     ax.savefig('images/results/gca.png')
 
-    rfc_disp = plot_roc_curve(rfc_model, X_test, y_test, ax=ax, alpha=0.8)
+    rfc_disp = RocCurveDisplay(rfc_model, X_test, y_test, ax=ax, alpha=0.8)
     ax=lrc_plot.plot(ax=ax, alpha=0.8)
     ax.savefig('images/results/lrcs.png')
 
@@ -269,7 +296,7 @@ def train_models(X_train, X_test, y_train, y_test):
     for model_ in list_models:
 
         # feature importance
-        feature_importance_plot(rfc_model,X_train,'images/results/')
+        feature_importance_plot(model_['model'],X_train,'images/results/')
 
         plt.rc('figure', figsize=(5, 5))
         #plt.text(0.01, 0.05, str(model.summary()), {'fontsize': 12}) old approach
@@ -278,7 +305,7 @@ def train_models(X_train, X_test, y_train, y_test):
         plt.text(0.01, 0.6, str(f'{model_["name"]}Test'), {'fontsize': 10}, fontproperties = 'monospace')
         plt.text(0.01, 0.7, str(classification_report(y_train, model_['y_train'])), {'fontsize': 10}, fontproperties = 'monospace') # approach improved by OP -> monospace!
         ax=plt.show()
-        ax.savefig(f'images/results/{model_}.png')
+        ax.savefig(f'images/results/{model_["name"]}.png')
 
 
 if __name__ == "__main__":

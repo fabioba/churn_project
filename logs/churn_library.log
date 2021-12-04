@@ -3,16 +3,30 @@ root - INFO - INFO: Testing import_data read file
 root - INFO - SUCCESS: Testing import_data read file
 root - INFO - SUCCESS: Testing import_data file is not empty
 root - INFO - INFO: Testing perform_eda
+root - INFO - INFO: Testing perform_eda: check dataframe shape > 0
 root - INFO - SUCCESS: Testing perform_eda: dataframe shape > 0
+root - INFO - INFO: Testing perform_eda: check no NULLS
 root - INFO - SUCCESS: Testing perform_eda: no NULL values in input dataframe
+root - INFO - INFO: Testing perform_eda: check path
 root - INFO - SUCCESS: Testing perform_eda: plot folder exists
+root - INFO - INFO: Testing perform_eda: check Attrition_Flag is string
+root - INFO - SUCCESS: Testing perform_eda: Attrition_Flag is string
+root - INFO - INFO: Testing perform_eda: plot stored in folder
 root - INFO - SUCCESS: Testing perform_eda: plot stored in folder
 root - INFO - INFO: Testing test_encoder_helper
+root - INFO - INFO: Testing test_encoder_helper: check dataframe not empty
 root - INFO - SUCCESS: Testing test_encoder_helper: dataframe shape > 0
+root - INFO - INFO: Testing test_encoder_helper: check no NULLS
 root - INFO - SUCCESS: Testing test_encoder_helper: no NULL values in input dataframe
+root - INFO - INFO: Testing test_encoder_helper: check category list not empty
 root - INFO - SUCCESS: Testing test_encoder_helper: category list does not exist
+root - INFO - INFO: Testing test_encoder_helper: check response variable str
 root - INFO - SUCCESS: Testing test_encoder_helper: response is string
+root - INFO - INFO: Testing test_encoder_helper: check list dataframe columns contains category list values
 root - INFO - SUCCESS: Testing test_encoder_helper: category list are columns in dataframe
+root - INFO - INFO: Testing test_encoder_helper: check response variable is contained in dataframe columns
 root - INFO - SUCCESS: Testing test_encoder_helper: response refers to a columns in dataframe
 root - INFO - INFO: Testing test_encoder_helper method
 root - INFO - SUCCESS: Testing test_encoder_helper: success performing new columns
+root - INFO - INFO: Testing test_encoder_helper method
+root - INFO - SUCCESS: Testing test_encoder_helper method
