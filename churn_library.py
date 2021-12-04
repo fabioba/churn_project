@@ -112,6 +112,9 @@ def encoder_helper(df, category_lst, response):
     except BaseException as err:
         logging.error('ERROR: encoder_helper: {}'.format(err))
 
+        #return empty dataframe
+        return pd.DataFrame()
+
 
 
 def perform_feature_engineering(df, keep_cols, response):
@@ -226,9 +229,9 @@ def train_models(X_train, X_test, y_train, y_test):
     rfc = RandomForestClassifier(random_state=42)
     lrc = LogisticRegression()
     param_grid = { 
-        'n_estimators': [200, 500],
+        'n_estimators': [20, 50],
         'max_features': ['auto', 'sqrt'],
-        'max_depth' : [4,5,100],
+        'max_depth' : [4,5,10],
         'criterion' :['gini', 'entropy']
         }
     cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
@@ -309,4 +312,10 @@ def train_models(X_train, X_test, y_train, y_test):
 
 
 if __name__ == "__main__":
-	import_data('data/bank_data.csv')
+    df=import_data('data/bank_data.csv')
+        
+    #perform eda
+    perform_eda(df,'images/eda/')
+
+    # encode   
+    df_encode=encoder_helper(df,['Gender','Education_Level','Marital_Status','Income_Category','Card_Category'],'Churn')

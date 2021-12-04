@@ -28,7 +28,7 @@ def test_import(import_data,pth):
 
         assert os.path.exists(pth)==True, 'path does not exist'
 
-        logging.info("INFO: Testing import_data read file")
+        logging.info("SUCCESS: Testing import_data: path exist")
         
         df= import_data(pth)    
 
@@ -36,23 +36,17 @@ def test_import(import_data,pth):
 
     except FileNotFoundError as err:
         logging.error("ERROR: Testing import_data: The file wasn't found: {}".format(err))
-
-    except BaseException as err:
-        logging.error("ERROR: Testing import_data error reading file: {}".format(err))
+    except AssertionError as err:
+        logging.error("ERROR: Testing import_data: {}".format(err))
 
     try:
         assert df.shape[0] > 0,'zero records'
         assert df.shape[1] > 0,'zero records'
-        logging.info("SUCCESS: Testing import_data file is not empty")
-
-        df_test=pd.read_csv(pth)
-
-        assert_frame_equal(df,df_test)
 
         return df
 
     except AssertionError as err:
-        logging.error("ERROR: Testing import_data: The file doesn't appear to have rows and columns: {}".format(err))
+        logging.error("ERROR: Testing import_data: {}".format(err))
     
         #return empty df
         return pd.DataFrame()   
@@ -70,23 +64,19 @@ def test_eda(perform_eda,df,pth_folder_plot):
         logging.info("INFO: Testing perform_eda")
 
         #check size of dataframe
-        logging.info("INFO: Testing perform_eda: check dataframe shape > 0")
         assert all([True if elem > 0 else False for elem in df.shape]),'empty df'
         logging.info("SUCCESS: Testing perform_eda: dataframe shape > 0")
        
 
         #check if exists any null values
-        logging.info("INFO: Testing perform_eda: check no NULLS")
         assert df.isnull().sum().sum()==0,'dataframe contains NULLS'
         logging.info("SUCCESS: Testing perform_eda: no NULL values in input dataframe")
 
         #check if folder to store plot exists
-        logging.info("INFO: Testing perform_eda: check path")
         assert os.path.exists(pth_folder_plot)==True, 'folder does not exist'
         logging.info("SUCCESS: Testing perform_eda: plot folder exists")
 
         #since we want to create churn from 'Attrition_Flag' I need to check it
-        logging.info("INFO: Testing perform_eda: check Attrition_Flag is string")
         assert df['Attrition_Flag'].dtype==object, 'Attrition_Flag is not string'
         logging.info("SUCCESS: Testing perform_eda: Attrition_Flag is string")
 
@@ -94,9 +84,15 @@ def test_eda(perform_eda,df,pth_folder_plot):
         logging.error("ERROR: test_eda: {}".format(err)) 
 
     try:
-        logging.info("INFO: Testing perform_eda: plot stored in folder")
         perform_eda(df,pth_folder_plot)
         logging.info("SUCCESS: Testing perform_eda: plot stored in folder")
+
+        #check if churn column is created
+        assert 'Churn' in list(df.columns),'CHURN columns not created'
+
+    except AssertionError as err:
+        logging.error("ERROR: test_eda: {}".format(err)) 
+
 
     except BaseException as err:
         logging.error("ERROR: Testing test_eda: error storing plots: {}".format(err))    
@@ -109,32 +105,26 @@ def test_encoder_helper(encoder_helper,df, category_lst, response):
         logging.info("INFO: Testing test_encoder_helper")
 
         #check size of dataframe
-        logging.info("INFO: Testing test_encoder_helper: check dataframe not empty")
         assert all([True if elem > 0 else False for elem in df.shape]),'empty dataframe'
         logging.info("SUCCESS: Testing test_encoder_helper: dataframe shape > 0")
 
         #check if exists any null values
-        logging.info("INFO: Testing test_encoder_helper: check no NULLS")
         assert df.isnull().sum().sum()==0,'dataframe contains NULLS'
         logging.info("SUCCESS: Testing test_encoder_helper: no NULL values in input dataframe")
 
         #check if category_lst exist
-        logging.info("INFO: Testing test_encoder_helper: check category list not empty")
         assert len(category_lst)>0,'category list empty'
         logging.info("SUCCESS: Testing test_encoder_helper: category list does not exist")
 
         #check if response is string
-        logging.info("INFO: Testing test_encoder_helper: check response variable str")
         assert isinstance(response,str),'response variable is not string'
         logging.info("SUCCESS: Testing test_encoder_helper: response is string")
 
         #check if category list are columns in dataframe
-        logging.info("INFO: Testing test_encoder_helper: check list dataframe columns contains category list values")
         assert all(elem in list(df.columns)  for elem in category_lst),'category list values are not in columns'
         logging.info("SUCCESS: Testing test_encoder_helper: category list are columns in dataframe")
 
         #check if response refers to a column in dataframe
-        logging.info("INFO: Testing test_encoder_helper: check response variable is contained in dataframe columns")
         assert response in list(df.columns),'response variable is not in dataframe columns'
         logging.info("SUCCESS: Testing test_encoder_helper: response refers to a columns in dataframe")
 
@@ -144,28 +134,14 @@ def test_encoder_helper(encoder_helper,df, category_lst, response):
         logging.error("ERROR: Testing test_encoder_helper: error: {}".format(err))    
 
     try:
-        logging.info("INFO: Testing test_encoder_helper method")
         # test method
         encoder_return = encoder_helper(df,category_lst,response)
         logging.info("SUCCESS: Testing test_encoder_helper: success performing new columns")  
 
-        df_copy=df.copy()
-        for cat in category_lst:
-            cat_lst = []
 
-            #group by current category and get mean of response variable (usually CHURN)
-            cat_groups = df_copy.groupby(cat).mean()[response]
-
-            #create list of values
-            for val in df_copy[cat]:
-                cat_lst.append(cat_groups.loc[val])
-
-            #append current list as new column on input dataframe
-            df_copy[f'{cat}_{response}'] = cat_lst     
-
-        logging.info("INFO: Testing test_encoder_helper method")
-        assert_frame_equal(encoder_return,df_copy)      
-        logging.info("SUCCESS: Testing test_encoder_helper method")
+        #check if encoder_helper method created Churn columns
+        assert all(f'{elem}_{response}' in list(df.columns) for elem in category_lst),'churn columns not created'
+        logging.info("SUCCESS: Testing test_encoder_helper: all churn columns created correctly")  
 
         return encoder_return
     except BaseException as err :
@@ -187,7 +163,6 @@ def test_perform_feature_engineering(perform_feature_engineering,df,keep_cols,re
 
         #check size of dataframe
         assert all([True if elem > 0 else False for elem in df.shape]), "dataframe shape>0"
-
         logging.info("SUCCESS: Testing test_perform_feature_engineering: dataframe shape > 0")
 
         #check if keep list are columns in dataframe
@@ -199,11 +174,6 @@ def test_perform_feature_engineering(perform_feature_engineering,df,keep_cols,re
         assert isinstance(response,str), "response is not str"
         logging.info("SUCCESS: Testing test_perform_feature_engineering: response is string")
 
-    except AssertionError as err:
-        logging.error("ERROR: Testing test_perform_feature_engineering: error assertion: {}".format(err))    
-
-    try:
-        logging.info("INFO: Testing test_perform_feature_engineering splitting dataframe")
         X_train, X_test, y_train, y_test = perform_feature_engineering(df,keep_cols,response)
         logging.info("SUCCESS: Testing test_perform_feature_engineering splitting dataframe")
 
@@ -218,6 +188,7 @@ def test_perform_feature_engineering(perform_feature_engineering,df,keep_cols,re
         logging.info("SUCCESS: Testing test_perform_feature_engineering alla splitted dataframe populated")
 
         return X_train, X_test, y_train, y_test
+
     except AssertionError as err:
         logging.error("ERROR: Testing test_perform_feature_engineering: error assertion: {}".format(err))    
 
@@ -245,7 +216,6 @@ def test_train_models(train_models,X_train, X_test, y_train, y_test):
         assert all([True if elem > 0 else False for elem in y_test.shape]), "y_test shape>0"
         logging.info("SUCCESS: Testing test_train_models asserts ok")
        
-        logging.info("INFO: Testing test_train_models")
         train_models(X_train, X_test, y_train, y_test)
         logging.info("SUCCESS: Testing test_train_models model trained correctly")
       
