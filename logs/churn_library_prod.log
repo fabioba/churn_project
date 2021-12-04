@@ -22,6 +22,3 @@ root - INFO - SUCCESS: Testing test_perform_feature_engineering: dataframe shape
 root - INFO - SUCCESS: Testing test_encoder_helper: keep_cols are columns in dataframe
 root - INFO - SUCCESS: Testing test_perform_feature_engineering: response is string
 root - INFO - SUCCESS: Testing test_perform_feature_engineering splitting dataframe
-root - INFO - SUCCESS: Testing test_perform_feature_engineering alla splitted dataframe populated
-root - INFO - INFO: Testing test_train_models asserts
-root - INFO - SUCCESS: Testing test_train_models asserts ok
