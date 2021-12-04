@@ -128,7 +128,7 @@ def test_encoder_helper(encoder_helper,df, category_lst, response):
     
 
 
-def test_perform_feature_engineering(perform_feature_engineering,df,response):
+def test_perform_feature_engineering(perform_feature_engineering,df,keep_cols,response):
     '''
     test perform_feature_engineering
     '''
@@ -136,12 +136,17 @@ def test_perform_feature_engineering(perform_feature_engineering,df,response):
         logging.info("INFO: Testing test_perform_feature_engineering")
 
         #check size of dataframe
-        assert all([True if elem > 0 else False for elem in df.shape])
+        assert all([True if elem > 0 else False for elem in df.shape]), "dataframe shape>0"
 
         logging.info("SUCCESS: Testing test_perform_feature_engineering: dataframe shape > 0")
 
+        #check if keep list are columns in dataframe
+        assert all(elem in list(df.columns)  for elem in keep_cols), "keep cols are not in dataframe"
+        logging.info("SUCCESS: Testing test_encoder_helper: keep_cols are columns in dataframe")
+
+
         #check if response is string
-        assert isinstance(response,str)
+        assert isinstance(response,str), "response is not str"
         logging.info("SUCCESS: Testing test_perform_feature_engineering: response is string")
 
     except AssertionError as err:
@@ -152,7 +157,7 @@ def test_perform_feature_engineering(perform_feature_engineering,df,response):
 
         perform_feature_engineering(df,response)
 
-    except:
+    except BaseException as err:
         logging.error("ERROR: Testing test_perform_feature_engineering: error splitting dataframe: {}".format(err))    
 
 
@@ -170,7 +175,14 @@ if __name__ == "__main__":
     #test_eda(df,cls.perform_eda,'images/eda/')
     #test_encoder_helper(cls.encoder_helper,df,['Gender','Education_Level','Marital_Status','Income_Category','Card_Category'],'Churn')
     response='Churn'
-    test_perform_feature_engineering(cls.perform_feature_engineering,df,response)
+    keep_cols = ['Customer_Age', 'Dependent_count', 'Months_on_book',
+             'Total_Relationship_Count', 'Months_Inactive_12_mon',
+             'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
+             'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt',
+             'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio',
+             'Gender_Churn', 'Education_Level_Churn', 'Marital_Status_Churn', 
+             'Income_Category_Churn', 'Card_Category_Churn']
+    X_train, X_test, y_train, y_test=test_perform_feature_engineering(cls.perform_feature_engineering,df,keep_cols,response)
 
 
 

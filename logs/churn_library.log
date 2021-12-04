@@ -1,8 +1,5 @@
-root - INFO - INFO: Testing test_encoder_helper
-root - INFO - SUCCESS: Testing test_encoder_helper: dataframe shape > 0
-root - INFO - SUCCESS: Testing test_encoder_helper: no NULL values in input dataframe
-root - INFO - SUCCESS: Testing test_encoder_helper: category list does not exist
-root - INFO - SUCCESS: Testing test_encoder_helper: response is string
-root - INFO - SUCCESS: Testing test_encoder_helper: category list are columns in dataframe
-root - INFO - SUCCESS: Testing test_encoder_helper: response refers to a columns in dataframe
-root - INFO - SUCCESS: Testing test_encoder_helper: success performing new columns
+root - INFO - INFO: Testing test_perform_feature_engineering
+root - INFO - SUCCESS: Testing test_perform_feature_engineering: dataframe shape > 0
+root - ERROR - ERROR: Testing test_perform_feature_engineering: error assertion: keep cols are not in dataframe
+root - INFO - INFO: Testing test_perform_feature_engineering splitting dataframe
+root - ERROR - ERROR: Testing test_perform_feature_engineering: error splitting dataframe: perform_feature_engineering() missing 1 required positional argument: 'response'
