@@ -26,7 +26,7 @@ def test_import(import_data, pth):
           import_data: method to test
           pth: path file
     output:
-          df_import: Dataframe    
+          df_import: Dataframe
     '''
     try:
         logging.info("INFO: Testing import_data asserts")
@@ -162,7 +162,7 @@ def test_encoder_helper(encoder_helper, df_import, category_lst, response):
 
         # check if encoder_helper is not empty
         assert encoder_return.shape[0] > 0, 'encoder_return not empty'
-        assert encoder_return.shape[1] > 0,'encoder_return not empty'
+        assert encoder_return.shape[1] > 0, 'encoder_return not empty'
         logging.info(
             "SUCCESS: Testing test_encoder_helper: encoder_return is not empty")
 
@@ -241,7 +241,6 @@ def test_perform_feature_engineering(
         return x_train, x_test, y_train, y_test
 
 
-
 def test_train_models(train_models, x_train, x_test, y_train, y_test):
     '''
     test train_models
@@ -259,7 +258,7 @@ def test_train_models(train_models, x_train, x_test, y_train, y_test):
 
         # check size of dataframe
         assert x_train.shape[0] > 0, "X_train shape = 0"
-        assert  x_train.shape[1] > 0, "X_train shape = 0"
+        assert x_train.shape[1] > 0, "X_train shape = 0"
         # check size of dataframe
         assert x_test.shape[0] > 0, "X_test shape = 0"
         assert x_test.shape[1] > 0, "X_test shape = 0"
@@ -312,14 +311,15 @@ if __name__ == "__main__":
                         'Churn')
 
     # test perform feature engineering
-    X_TRAIN, X_TEST, Y_TRAIN, Y_TEST = test_perform_feature_engineering(cls.perform_feature_engineering,
-                                                                        DF_IMPORT, ['Customer_Age', 'Dependent_count', 'Months_on_book',
-                                                                                    'Total_Relationship_Count', 'Months_Inactive_12_mon',
-                                                                                    'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
-                                                                                    'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt',
-                                                                                    'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio',
-                                                                                    'Gender_Churn', 'Education_Level_Churn', 'Marital_Status_Churn',
-                                                                                    'Income_Category_Churn', 'Card_Category_Churn'], 'Churn')
+    X_TRAIN, X_TEST, Y_TRAIN, Y_TEST = test_perform_feature_engineering(
+        cls.perform_feature_engineering,
+        DF_IMPORT, ['Customer_Age', 'Dependent_count', 'Months_on_book',
+        'Total_Relationship_Count', 'Months_Inactive_12_mon',
+        'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
+        'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt',
+        'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio',
+        'Gender_Churn', 'Education_Level_Churn', 'Marital_Status_Churn',
+        'Income_Category_Churn', 'Card_Category_Churn'], 'Churn')
 
     # test train model
     test_train_models(cls.train_models,
