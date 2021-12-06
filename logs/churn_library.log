@@ -1,2 +1,29 @@
-root - INFO - INFO: test_import: ok
-root - ERROR - Testing import_eda: The file wasn't found
+root - INFO - INFO: Testing import_data asserts
+root - INFO - SUCCESS: Testing import_data: path exist
+root - INFO - SUCCESS: Testing import_data read file
+root - INFO - INFO: Testing perform_eda
+root - INFO - SUCCESS: Testing perform_eda: dataframe shape > 0
+root - INFO - SUCCESS: Testing perform_eda: no NULL values in input dataframe
+root - INFO - SUCCESS: Testing perform_eda: plot folder exists
+root - INFO - SUCCESS: Testing perform_eda: Attrition_Flag is string
+root - INFO - SUCCESS: Testing perform_eda: plot stored in folder
+root - INFO - INFO: Testing test_encoder_helper
+root - INFO - SUCCESS: Testing test_encoder_helper: dataframe shape > 0
+root - INFO - SUCCESS: Testing test_encoder_helper: no NULL values in input dataframe
+root - INFO - SUCCESS: Testing test_encoder_helper: category list does not exist
+root - INFO - SUCCESS: Testing test_encoder_helper: response is string
+root - INFO - SUCCESS: Testing test_encoder_helper: category list are columns in dataframe
+root - INFO - SUCCESS: Testing test_encoder_helper: response refers to a columns in dataframe
+root - INFO - SUCCESS: Testing test_encoder_helper: success performing new columns
+root - INFO - SUCCESS: Testing test_encoder_helper: encoder_return is not empty
+root - INFO - SUCCESS: Testing test_encoder_helper: all churn columns created correctly
+root - INFO - INFO: Testing test_perform_feature_engineering
+root - INFO - SUCCESS: Testing test_perform_feature_engineering: dataframe shape > 0
+root - INFO - SUCCESS: Testing test_encoder_helper: keep_cols are columns in dataframe
+root - INFO - SUCCESS: Testing test_perform_feature_engineering: response is string
+root - INFO - SUCCESS: Testing test_perform_feature_engineering splitting dataframe
+root - INFO - SUCCESS: Testing test_perform_feature_engineering alla splitted dataframe populated
+root - INFO - INFO: Testing test_train_models asserts
+root - INFO - SUCCESS: Testing input test_train_models asserts ok
+root - INFO - SUCCESS: Testing test_train_models model trained correctly
+root - INFO - SUCCESS: Testing test_train_models after run asserts ok
