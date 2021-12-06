@@ -340,16 +340,28 @@ def train_models(x_train, x_test, y_train, y_test):
 
 
 if __name__ == "__main__":
-    df = import_data('data/bank_data.csv')
+    # read data
+    DF_INPUT = import_data('data/bank_data.csv')
 
     # perform eda
-    perform_eda(df, 'images/eda')
+    perform_eda(DF_INPUT, 'images/eda')
 
     # encode
-    df_encode = encoder_helper(df,
+    DF_ENCODE = encoder_helper(DF_INPUT,
                                ['Gender',
                                 'Education_Level',
                                 'Marital_Status',
                                 'Income_Category',
                                 'Card_Category'],
                                'Churn')
+
+    # feature engineering
+    X_TRAIN, X_TEST, Y_TRAIN, Y_TEST = perform_feature_engineering(DF_ENCODE,['Customer_Age', 'Dependent_count', 'Months_on_book',
+                                                                                    'Total_Relationship_Count', 'Months_Inactive_12_mon',
+                                                                                    'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
+                                                                                    'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt',
+                                                                                    'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio',
+                                                                                    'Gender_Churn', 'Education_Level_Churn', 'Marital_Status_Churn',
+                                                                                    'Income_Category_Churn', 'Card_Category_Churn'], 'Churn')
+    # train model
+    train_models(X_TRAIN,X_TEST,Y_TRAIN,Y_TEST)
