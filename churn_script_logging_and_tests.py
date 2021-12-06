@@ -214,7 +214,7 @@ def test_perform_feature_engineering(
             df_import, keep_cols, response)
         logging.info(
             "SUCCESS: Testing test_perform_feature_engineering splitting dataframe")
-        print(y_train.shape)
+
         # check size of dataframe
         assert x_train.shape[0] > 0, "X_train shape = 0"
         assert x_train.shape[1] > 0, "X_train shape = 0"
@@ -266,7 +266,7 @@ def test_train_models(train_models, x_train, x_test, y_train, y_test):
         assert y_train.shape[0] > 0, "y_train shape = 0"
         # check size of dataframe
         assert y_test.shape[0] > 0, "y_test shape = 0"
-        logging.info("SUCCESS: Testing test_train_models asserts ok")
+        logging.info("SUCCESS: Testing input test_train_models asserts ok")
 
        # train models
         train_models(x_train, x_test, y_train, y_test)
@@ -288,9 +288,17 @@ def test_train_models(train_models, x_train, x_test, y_train, y_test):
         assert os.path.exists(
             './models/logistic_model.pkl') is True, 'path does not exist'
 
+        logging.info("SUCCESS: Testing test_train_models after run asserts ok")
+
     except AssertionError as err:
         logging.error(
             "ERROR: Testing test_train_models: error assertion: %s", err)
+    except ValueError as err:
+        logging.error(
+            "ERROR: Testing test_train_models: value error: %s", err)
+    except AttributeError as err:
+        logging.error(
+            "ERROR: Testing test_train_models: value error: %s", err)
 
 
 if __name__ == "__main__":

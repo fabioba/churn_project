@@ -264,12 +264,13 @@ def train_models(x_train, x_test, y_train, y_test):
     rfc = RandomForestClassifier(random_state=42)
     lrc = LogisticRegression()
     param_grid = {
-        'n_estimators': [20, 50],
-        'max_plot_features': ['auto', 'sqrt'],
-        'max_plot_depth': [4, 5, 10],
+        'n_estimators': [20, 30],
+        'max_features': ['auto', 'sqrt'],
+        'max_depth': [2,3],
         'criterion': ['gini', 'entropy']
     }
     cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
+    
     cv_rfc.fit(x_train, y_train)
 
     lrc.fit(x_train, y_train)
@@ -313,8 +314,8 @@ def train_models(x_train, x_test, y_train, y_test):
 
     fig = plt.figure(figsize=(15, 8))
     rfc_disp = RocCurveDisplay.from_estimator(
-        cv_rfc.best_estimator_, x_test, y_test, ax_plot=ax_plot, alpha=0.8)
-    rfc_disp.plot(ax_plot=ax_plot, alpha=0.8)
+        cv_rfc.best_estimator_, x_test, y_test, ax=ax_plot, alpha=0.8)
+    rfc_disp.plot(ax=ax_plot, alpha=0.8)
     plt.savefig('images/results/rfc.png')
     plt.close(fig)
 
