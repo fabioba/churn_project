@@ -19,11 +19,11 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report, RocCurveDisplay
 
 
-logging.basicConfig(
-    filename='./logs/churn_library_prod.log',
-    level=logging.INFO,
-    filemode='w',
-    format='%(name)s - %(levelname)s - %(message)s')
+#logging.basicConfig(
+#    filename='./logs/churn_library_prod.log',
+#    level=logging.INFO,
+#    filemode='w',
+#    format='%(name)s - %(levelname)s - %(message)s')
 
 
 def import_data(pth):
@@ -45,7 +45,8 @@ def import_data(pth):
 
         return df
     except FileNotFoundError as err:
-        logging.error('ERROR: import_data: %s',err)
+        #logging.error('ERROR: import_data: %s',err)
+        print('ERROR: import_data: %s',err)
         return pd.DataFrame()
 
 
@@ -85,7 +86,8 @@ def perform_eda(df, path_folder_plot):
         ax.figure.savefig(path_plot)
 
     except ValueError as err:
-        logging.error('ERROR: perform_eda: %s',err)
+        #logging.error('ERROR: perform_eda: %s',err)
+        print('ERROR: perform_eda: %s',err)
 
 
 def encoder_helper(df, category_lst, response):
@@ -96,7 +98,7 @@ def encoder_helper(df, category_lst, response):
     input:
             df: pandas dataframe
             category_lst: list of columns that contain categorical features
-            response: string of response name [optional argument that could be used for naming variables or index y column]
+            response: string of response name [optional]
 
     output:
             df: pandas dataframe with new columns for
@@ -123,7 +125,7 @@ def encoder_helper(df, category_lst, response):
         return df
     except ValueError as err:
         logging.error('ERROR: encoder_helper: %s',err)
-
+        print('ERROR: encoder_helper: %s',err)
         # return empty dataframe
         return pd.DataFrame()
 
@@ -133,7 +135,7 @@ def perform_feature_engineering(df, keep_cols, response):
     input:
               df: pandas dataframe
               keep_cols: list of columns to create X dataframe
-              response: string of response name [optional argument that could be used for naming variables or index y column]
+              response: string of response name [optional]
 
     output:
               X_train: X training data
@@ -160,7 +162,8 @@ def perform_feature_engineering(df, keep_cols, response):
         # return dataframes
         return x_train, x_test, y_train, y_test
     except ValueError as err:
-        logging.error('ERROR: perform_feature_engineering: %s',err)
+        #logging.error('ERROR: perform_feature_engineering: %s',err)
+        print('ERROR: perform_feature_engineering: %s',err)
         # create empty dataframes
         x_train = pd.DataFrame()
         x_test = pd.DataFrame()
@@ -197,7 +200,8 @@ def classification_report_image(y_train,
         print(classification_report(y_test, y_test_preds_lr))
         print(classification_report(y_train, y_train_preds_lr))
     except ValueError as err:
-        logging.error('classification_report_image %s',err)
+        print('classification_report_image %s',err)
+        #logging.error('classification_report_image %s',err)
 
 
 def feature_importance_plot(model, x_data, output_pth):
@@ -235,7 +239,8 @@ def feature_importance_plot(model, x_data, output_pth):
 
         plt.savefig(output_pth)
     except ValueError as err:
-        logging.error('feature_importance_plot %s',err)
+        print('feature_importance_plot %s',err)
+        #logging.error('feature_importance_plot %s',err)
 
 
 def train_models(x_train, x_test, y_train, y_test):

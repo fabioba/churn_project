@@ -195,7 +195,7 @@ def test_perform_feature_engineering(
         logging.info("INFO: Testing test_perform_feature_engineering")
 
         # check size of dataframe
-        assert df_import.shape[0] > 0 and df_import.shape[1] > 0, "dataframe shape>0"
+        assert df_import.shape[0] > 0 and df_import.shape[1] > 0, "dataframe shape = 0"
         logging.info(
             "SUCCESS: Testing test_perform_feature_engineering: dataframe shape > 0")
 
@@ -214,15 +214,17 @@ def test_perform_feature_engineering(
             df_import, keep_cols, response)
         logging.info(
             "SUCCESS: Testing test_perform_feature_engineering splitting dataframe")
-
+        print(y_train.shape)
         # check size of dataframe
-        assert x_train.shape[0] > 0 and x_train.shape[1] > 0, "X_train shape>0"
+        assert x_train.shape[0] > 0, "X_train shape = 0"
+        assert x_train.shape[1] > 0, "X_train shape = 0"
         # check size of dataframe
-        assert x_test.shape[0] > 0 and x_test.shape[1] > 0, "X_test shape>0"
+        assert x_test.shape[0] > 0, "X_test shape = 0"
+        assert x_test.shape[1] > 0, "X_test shape = 0"
         # check size of dataframe
-        assert y_train.shape[0] > 0 and y_train.shape[1] > 0, "y_train shape>0"
+        assert y_train.shape[0] > 0, "y_train shape = 0"
         # check size of dataframe
-        assert y_test.shape[0] > 0 and y_test.shape[1] > 0, "y_test shape>0"
+        assert y_test.shape[0] > 0, "y_test shape = 0"
         logging.info(
             "SUCCESS: Testing test_perform_feature_engineering alla splitted dataframe populated")
 
@@ -256,13 +258,15 @@ def test_train_models(train_models, x_train, x_test, y_train, y_test):
         logging.info("INFO: Testing test_train_models asserts")
 
         # check size of dataframe
-        assert x_train.shape[0] > 0 and x_train.shape[1] > 0, "X_train shape>0"
+        assert x_train.shape[0] > 0, "X_train shape = 0"
+        assert  x_train.shape[1] > 0, "X_train shape = 0"
         # check size of dataframe
-        assert x_test.shape[0] > 0 and x_test.shape[1] > 0, "X_test shape>0"
+        assert x_test.shape[0] > 0, "X_test shape = 0"
+        assert x_test.shape[1] > 0, "X_test shape = 0"
         # check size of dataframe
-        assert y_train.shape[0] > 0 and y_train.shape[1] > 0, "y_train shape>0"
+        assert y_train.shape[0] > 0, "y_train shape = 0"
         # check size of dataframe
-        assert y_test.shape[0] > 0 and y_test.shape[1] > 0, "y_test shape>0"
+        assert y_test.shape[0] > 0, "y_test shape = 0"
         logging.info("SUCCESS: Testing test_train_models asserts ok")
 
        # train models
