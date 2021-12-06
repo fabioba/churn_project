@@ -4,7 +4,6 @@ This module contains churn project
 Author: Fabio
 Date: 4Dec. 2021
 """
-import logging
 import os
 import shap
 import joblib
@@ -35,19 +34,14 @@ def import_data(pth):
     output:
             df_read: pandas dataframe
     '''
-    try:
-        # create empty df
-        df_read = pd.DataFrame()
+    # create empty df
+    df_read = pd.DataFrame()
 
-        # check if paths exists
-        if os.path.exists(pth):
-            df_read = pd.read_csv(pth)
+    # check if paths exists
+    if os.path.exists(pth):
+        df_read = pd.read_csv(pth)
 
-        return df_read
-    except FileNotFoundError as err:
-        #logging.error('ERROR: import_data: %s',err)
-        print('ERROR: import_data: %s', err)
-        return pd.DataFrame()
+    return df_read
 
 
 def perform_eda(df_input, path_folder_plot):
@@ -59,44 +53,39 @@ def perform_eda(df_input, path_folder_plot):
     output:
             None
     '''
-    try:
-        # create binary variable
-        df_input['Churn'] = df_input['Attrition_Flag'].apply(
-            lambda val: 0 if val == "Existing Customer" else 1)
+    # create binary variable
+    df_input['Churn'] = df_input['Attrition_Flag'].apply(
+        lambda val: 0 if val == "Existing Customer" else 1)
 
-        # perform plots and store in folder
-        fig = plt.figure(figsize=(20, 10))
-        ax_plot = df_input['Churn'].hist()
-        path_plot = f'{path_folder_plot}/churn_hist.png'
-        ax_plot.figure.savefig(path_plot)
-        plt.close(fig)
+    # perform plots and store in folder
+    fig = plt.figure(figsize=(20, 10))
+    ax_plot = df_input['Churn'].hist()
+    path_plot = f'{path_folder_plot}/churn_hist.png'
+    ax_plot.figure.savefig(path_plot)
+    plt.close(fig)
 
-        fig = plt.figure(figsize=(20, 10))
-        ax_plot = df_input.Marital_Status.value_counts(
-            'normalize').plot(kind='bar')
-        path_plot = f'{path_folder_plot}/Marital_Status_bar.png'
-        ax_plot.figure.savefig(path_plot)
-        plt.close(fig)
+    fig = plt.figure(figsize=(20, 10))
+    ax_plot = df_input.Marital_Status.value_counts(
+        'normalize').plot(kind='bar')
+    path_plot = f'{path_folder_plot}/Marital_Status_bar.png'
+    ax_plot.figure.savefig(path_plot)
+    plt.close(fig)
 
-        fig = plt.figure(figsize=(20, 10))
-        ax_plot = sns.distplot(df_input['Total_Trans_Ct'])
-        path_plot = f'{path_folder_plot}/Total_Trans_Ct_bar.png'
-        ax_plot.figure.savefig(path_plot)
-        plt.close(fig)
+    fig = plt.figure(figsize=(20, 10))
+    ax_plot = sns.distplot(df_input['Total_Trans_Ct'])
+    path_plot = f'{path_folder_plot}/Total_Trans_Ct_bar.png'
+    ax_plot.figure.savefig(path_plot)
+    plt.close(fig)
 
-        fig = plt.figure(figsize=(20, 10))
-        ax_plot = sns.heatmap(
-            df_input.corr(),
-            annot=False,
-            cmap='Dark2_r',
-            linewidths=2)
-        path_plot = f'{path_folder_plot}/corr.png'
-        ax_plot.figure.savefig(path_plot)
-        plt.close(fig)
-
-    except ValueError as err:
-        #logging.error('ERROR: perform_eda: %s',err)
-        print('ERROR: perform_eda: %s', err)
+    fig = plt.figure(figsize=(20, 10))
+    ax_plot = sns.heatmap(
+        df_input.corr(),
+        annot=False,
+        cmap='Dark2_r',
+        linewidths=2)
+    path_plot = f'{path_folder_plot}/corr.png'
+    ax_plot.figure.savefig(path_plot)
+    plt.close(fig)
 
 
 def encoder_helper(df_input, category_lst, response):
@@ -112,31 +101,25 @@ def encoder_helper(df_input, category_lst, response):
     output:
             df_input: pandas dataframe with new columns for
     '''
-    try:
 
-        # check if category list is not empty and response is not null
-        if ((len(category_lst) > 0) and (isinstance(response, object))):
-            # iterate over list of category variables
-            for cat in category_lst:
-                cat_lst = []
+    # check if category list is not empty and response is not null
+    if ((len(category_lst) > 0) and (isinstance(response, object))):
+        # iterate over list of category variables
+        for cat in category_lst:
+            cat_lst = []
 
-                # group by current category and get mean of response variable
-                # (usually CHURN)
-                cat_groups = df_input.groupby(cat).mean()[response]
+            # group by current category and get mean of response variable
+            # (usually CHURN)
+            cat_groups = df_input.groupby(cat).mean()[response]
 
-                # create list of values
-                for val in df_input[cat]:
-                    cat_lst.append(cat_groups.loc[val])
+            # create list of values
+            for val in df_input[cat]:
+                cat_lst.append(cat_groups.loc[val])
 
-                # append current list as new column on input dataframe
-                df_input[f'{cat}_{response}'] = cat_lst
+            # append current list as new column on input dataframe
+            df_input[f'{cat}_{response}'] = cat_lst
 
-        return df_input
-    except ValueError as err:
-        logging.error('ERROR: encoder_helper: %s', err)
-        print('ERROR: encoder_helper: %s', err)
-        # return empty dataframe
-        return pd.DataFrame()
+    return df_input
 
 
 def perform_feature_engineering(df_input, keep_cols, response):
@@ -152,36 +135,26 @@ def perform_feature_engineering(df_input, keep_cols, response):
               y_train: y training data
               y_test: y testing data
     '''
-    try:
-        # create empty dataframes
-        x_train = pd.DataFrame()
-        x_test = pd.DataFrame()
-        y_train = pd.DataFrame()
-        y_test = pd.DataFrame()
+    # create empty dataframes
+    x_train = pd.DataFrame()
+    x_test = pd.DataFrame()
+    y_train = pd.DataFrame()
+    y_test = pd.DataFrame()
 
-        # check if keep cols is not null, if response variable is string
-        # and if df_input input is not empty
-        if ((len(keep_cols) > 0) and (isinstance(response, object)) and
-                (df_input.shape[0] > 0) and (df_input.shape[1] > 0)):
+    # check if keep cols is not null, if response variable is string
+    # and if df_input input is not empty
+    if ((len(keep_cols) > 0) and (isinstance(response, object)) and
+            (df_input.shape[0] > 0) and (df_input.shape[1] > 0)):
 
-            x_df = df_input[keep_cols]
-            y_df = df_input[response]
+        x_df = df_input[keep_cols]
+        y_df = df_input[response]
 
-            # split input dataframe
-            x_train, x_test, y_train, y_test = train_test_split(
-                x_df, y_df, test_size=0.3, random_state=42)
+        # split input dataframe
+        x_train, x_test, y_train, y_test = train_test_split(
+            x_df, y_df, test_size=0.3, random_state=42)
 
-        # return dataframes
-        return x_train, x_test, y_train, y_test
-    except ValueError as err:
-        #logging.error('ERROR: perform_feature_engineering: %s',err)
-        print('ERROR: perform_feature_engineering: %s', err)
-        # create empty dataframes
-        x_train = pd.DataFrame()
-        x_test = pd.DataFrame()
-        y_train = pd.DataFrame()
-        y_test = pd.DataFrame()
-        return x_train, x_test, y_train, y_test
+    # return dataframes
+    return x_train, x_test, y_train, y_test
 
 
 def classification_report_image(y_train,
@@ -200,13 +173,9 @@ def classification_report_image(y_train,
     output:
              None
     '''
-    try:
-        # scores
-        print(classification_report(y_test, y_test_model))
-        print(classification_report(y_train, y_train_model))
-    except ValueError as err:
-        print('classification_report_image %s', err)
-        #logging.error('classification_report_image %s',err)
+    # scores
+    print(classification_report(y_test, y_test_model))
+    print(classification_report(y_train, y_train_model))
 
 
 def feature_importance_plot(model, x_data, output_pth):
@@ -220,33 +189,29 @@ def feature_importance_plot(model, x_data, output_pth):
     output:
              None
              '''
-    try:
-        # Calculate feature importances
-        importances = model.best_estimator_.feature_importances_
-        # Sort feature importances in descending order
-        indices = np.argsort(importances)[::-1]
+    # Calculate feature importances
+    importances = model.best_estimator_.feature_importances_
+    # Sort feature importances in descending order
+    indices = np.argsort(importances)[::-1]
 
-        # Rearrange feature names so they match the sorted feature importances
-        names = [x_data.columns[i] for i in indices]
+    # Rearrange feature names so they match the sorted feature importances
+    names = [x_data.columns[i] for i in indices]
 
-        # Create plot
-        fig = plt.figure(figsize=(20, 5))
+    # Create plot
+    fig = plt.figure(figsize=(20, 5))
 
-        # Create plot title
-        plt.title("Feature Importance")
-        plt.ylabel('Importance')
+    # Create plot title
+    plt.title("Feature Importance")
+    plt.ylabel('Importance')
 
-        # Add bars
-        plt.bar(range(x_data.shape[1]), importances[indices])
+    # Add bars
+    plt.bar(range(x_data.shape[1]), importances[indices])
 
-        # Add feature names as x-ax_plotis labels
-        plt.xticks(range(x_data.shape[1]), names, rotation=90)
+    # Add feature names as x-ax_plotis labels
+    plt.xticks(range(x_data.shape[1]), names, rotation=90)
 
-        plt.savefig(output_pth)
-        plt.close(fig)
-    except ValueError as err:
-        print('feature_importance_plot %s', err)
-        #logging.error('feature_importance_plot %s',err)
+    plt.savefig(output_pth)
+    plt.close(fig)
 
 
 def train_models(x_train, x_test, y_train, y_test):
@@ -266,11 +231,11 @@ def train_models(x_train, x_test, y_train, y_test):
     param_grid = {
         'n_estimators': [20, 30],
         'max_features': ['auto', 'sqrt'],
-        'max_depth': [2,3],
+        'max_depth': [2, 3],
         'criterion': ['gini', 'entropy']
     }
     cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
-    
+
     cv_rfc.fit(x_train, y_train)
 
     lrc.fit(x_train, y_train)
@@ -300,19 +265,19 @@ def train_models(x_train, x_test, y_train, y_test):
                                     mod['y_train_model'],
                                     mod['y_test_model'])
     # plot roc
-    fig = plt.figure(figsize=(20,10))
+    fig = plt.figure(figsize=(20, 10))
     lrc_plot = RocCurveDisplay.from_estimator(lrc, x_test, y_test)
     lrc_plot.plot()
     plt.savefig('images/results/lrc_plot.png')
     plt.close(fig)
 
     # plots
-    fig = plt.figure(figsize=(20,10))
+    fig = plt.figure(figsize=(20, 10))
     ax_plot = plt.gca()
     ax_plot.figure.savefig('images/results/gca.png')
     plt.close(fig)
 
-    fig = plt.figure(figsize=(20,10))
+    fig = plt.figure(figsize=(20, 10))
     rfc_disp = RocCurveDisplay.from_estimator(
         cv_rfc.best_estimator_, x_test, y_test, ax=ax_plot, alpha=0.8)
     rfc_disp.plot(ax=ax_plot, alpha=0.8)
@@ -356,13 +321,19 @@ def train_models(x_train, x_test, y_train, y_test):
         plt.text(0.01, 1.25, str(f'{model_["name"]} Train'), {
                  'fontsize': 10}, fontproperties='monospace')
         # approach improved by OP -> monospace!
-        plt.text(0.01, 0.05, str(classification_report(y_test, model_['y_test'])), {
-                 'fontsize': 10}, fontproperties='monospace')
+        plt.text(
+            0.01, 0.05, str(
+                classification_report(
+                    y_test, model_['y_test'])), {
+                'fontsize': 10}, fontproperties='monospace')
         plt.text(0.01, 0.6, str(f'{model_["name"]}Test'), {
                  'fontsize': 10}, fontproperties='monospace')
         # approach improved by OP -> monospace!
-        plt.text(0.01, 0.7, str(classification_report(y_train, model_['y_train'])), {
-                 'fontsize': 10}, fontproperties='monospace')
+        plt.text(
+            0.01, 0.7, str(
+                classification_report(
+                    y_train, model_['y_train'])), {
+                'fontsize': 10}, fontproperties='monospace')
         plt.savefig(f'images/results/{model_["name"]}.png')
         plt.close(fig)
 
