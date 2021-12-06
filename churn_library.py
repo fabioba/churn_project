@@ -37,13 +37,13 @@ def import_data(pth):
     '''
     try:
         # create empty df
-        df = pd.DataFrame()
+        df_read = pd.DataFrame()
 
         # check if paths exists
         if os.path.exists(pth):
-            df = pd.read_csv(pth)
+            df_read = pd.read_csv(pth)
 
-        return df
+        return df_read
     except FileNotFoundError as err:
         #logging.error('ERROR: import_data: %s',err)
         print('ERROR: import_data: %s',err)
@@ -65,25 +65,29 @@ def perform_eda(df, path_folder_plot):
             lambda val: 0 if val == "Existing Customer" else 1)
 
         # perform plots and store in folder
-        plt.figure(figsize=(20, 10))
+        fig=plt.figure(figsize=(20, 10))
         ax = df['Churn'].hist()
         path_plot = f'{path_folder_plot}/churn_hist.png'
         ax.figure.savefig(path_plot)
+        plt.close(fig)
 
-        plt.figure(figsize=(20, 10))
+        fig=plt.figure(figsize=(20, 10))
         ax = df.Marital_Status.value_counts('normalize').plot(kind='bar')
         path_plot = f'{path_folder_plot}/Marital_Status_bar.png'
         ax.figure.savefig(path_plot)
+        plt.close(fig)
 
-        plt.figure(figsize=(20, 10))
+        fig=plt.figure(figsize=(20, 10))
         ax = sns.distplot(df['Total_Trans_Ct'])
         path_plot = f'{path_folder_plot}/Total_Trans_Ct_bar.png'
         ax.figure.savefig(path_plot)
+        plt.close(fig)
 
-        plt.figure(figsize=(20, 10))
+        fig=plt.figure(figsize=(20, 10))
         ax = sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths=2)
         path_plot = f'{path_folder_plot}/corr.png'
         ax.figure.savefig(path_plot)
+        plt.close(fig)
 
     except ValueError as err:
         #logging.error('ERROR: perform_eda: %s',err)
@@ -225,7 +229,7 @@ def feature_importance_plot(model, x_data, output_pth):
         names = [x_data.columns[i] for i in indices]
 
         # Create plot
-        plt.figure(figsize=(20, 5))
+        fig=plt.figure(figsize=(20, 5))
 
         # Create plot title
         plt.title("Feature Importance")
@@ -238,6 +242,7 @@ def feature_importance_plot(model, x_data, output_pth):
         plt.xticks(range(x_data.shape[1]), names, rotation=90)
 
         plt.savefig(output_pth)
+        plt.close(fig)
     except ValueError as err:
         print('feature_importance_plot %s',err)
         #logging.error('feature_importance_plot %s',err)
@@ -281,21 +286,25 @@ def train_models(x_train, x_test, y_train, y_test):
                                 y_train_preds_rf,
                                 y_test_preds_lr,
                                 y_test_preds_rf)
-    #
+    # plot roc
+    fig=plt.figure(figsize=(15, 8))
     lrc_plot = RocCurveDisplay.from_estimator(lrc, x_test, y_test)
     lrc_plot.plot()
-
     plt.savefig('images/results/lrc_plot.png')
+    plt.close(fig)
 
     # plots
-    plt.figure(figsize=(15, 8))
+    fig=plt.figure(figsize=(15, 8))
     ax = plt.gca()
     ax.figure.savefig('images/results/gca.png')
-
+    plt.close(fig)
+    
+    fig=plt.figure(figsize=(15, 8))
     rfc_disp = RocCurveDisplay.from_estimator(
         cv_rfc.best_estimator_, x_test, y_test, ax=ax, alpha=0.8)
     rfc_disp.plot(ax=ax, alpha=0.8)
     plt.savefig('images/results/rfc.png')
+    plt.close(fig)
 
     # save best model
     joblib.dump(cv_rfc.best_estimator_, './models/rfc_model.pkl')
@@ -306,10 +315,12 @@ def train_models(x_train, x_test, y_train, y_test):
     lr_model = joblib.load('./models/logistic_model.pkl')
 
     # shape values
+    fig=plt.figure(figsize=(20, 10))
     explainer = shap.TreeExplainer(cv_rfc.best_estimator_)
     shap_values = explainer.shap_values(x_test)
     shap.summary_plot(shap_values, x_test, plot_type="bar")
     plt.savefig('images/eda/shap_summary.png')
+    plt.close(fig)
 
     # feature importance
     feature_importance_plot(cv_rfc, x_train, 'images/results/cv_rfc.png')
@@ -325,7 +336,7 @@ def train_models(x_train, x_test, y_train, y_test):
     # iterate over list of models
     for model_ in list_models:
 
-        plt.rc('figure', figsize=(5, 5))
+        fig=plt.rc('figure', figsize=(5, 5))
         # plt.text(0.01, 0.05, str(model.summary()), {'fontsize': 12}) old
         # approach
         plt.text(0.01, 1.25, str(f'{model_["name"]} Train'), {
@@ -337,6 +348,7 @@ def train_models(x_train, x_test, y_train, y_test):
         plt.text(0.01, 0.7, str(classification_report(y_train, model_['y_train'])), {
                  'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
         plt.savefig(f'images/results/{model_["name"]}.png')
+        plt.close(fig)
 
 
 if __name__ == "__main__":
