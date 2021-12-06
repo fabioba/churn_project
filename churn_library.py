@@ -300,19 +300,19 @@ def train_models(x_train, x_test, y_train, y_test):
                                     mod['y_train_model'],
                                     mod['y_test_model'])
     # plot roc
-    fig = plt.figure(figsize=(15, 8))
+    fig = plt.figure(figsize=(20,10))
     lrc_plot = RocCurveDisplay.from_estimator(lrc, x_test, y_test)
     lrc_plot.plot()
     plt.savefig('images/results/lrc_plot.png')
     plt.close(fig)
 
     # plots
-    fig = plt.figure(figsize=(15, 8))
+    fig = plt.figure(figsize=(20,10))
     ax_plot = plt.gca()
     ax_plot.figure.savefig('images/results/gca.png')
     plt.close(fig)
 
-    fig = plt.figure(figsize=(15, 8))
+    fig = plt.figure(figsize=(20,10))
     rfc_disp = RocCurveDisplay.from_estimator(
         cv_rfc.best_estimator_, x_test, y_test, ax=ax_plot, alpha=0.8)
     rfc_disp.plot(ax=ax_plot, alpha=0.8)
